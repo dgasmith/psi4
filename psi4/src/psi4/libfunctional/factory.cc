@@ -30,6 +30,7 @@
  PRAGMA_WARNING_IGNORE_DEPRECATED_DECLARATIONS
  #include <memory>
  PRAGMA_WARNING_POP
+#include "libxc/xc.h"
 #include "psi4/psi4-dec.h"
 #include "functional.h"
 #include "xfunctional.h"
@@ -45,6 +46,7 @@
 #include "FT97_Cfunctional.h"
 #include "VWN3_Cfunctional.h"
 #include "VWN5_Cfunctional.h"
+#include "LibXCfunctional.h"
 
 namespace psi {
 
@@ -196,8 +198,9 @@ std::shared_ptr<Functional> Functional::build_base(const std::string& alias)
         x->meta_type_ = XFunctional::Meta_None;
         x->sr_type_   = XFunctional::SR_None;
         fun = static_cast<Functional*>(x);
-     }
-   else {
+    } else if (xc_functional_get_number(alias.c_str()) >= 0){
+        fun = static_cast<Functional*>(new LibXCFunctional(alias));
+    } else {
         throw PSIEXCEPTION("Functional::build_base: Unrecognized base Functional.");
     }
 
