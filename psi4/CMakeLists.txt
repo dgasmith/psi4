@@ -33,6 +33,8 @@ if(${ENABLE_dkh})
     find_package(dkh CONFIG REQUIRED)
 endif()
 find_package(libefp CONFIG REQUIRED COMPONENTS shallow)
+find_package(libxc MODULE REQUIRED)
+message("libxc PRITN  ${LIBXC_LIBRARIES} ${LIBXC_INCLUDE_DIRS} ${LIBXC_FOUND}")
 if(${ENABLE_erd})
     find_package(erd CONFIG REQUIRED)
 endif()
@@ -165,3 +167,4 @@ write_basic_package_version_file(
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/cmake/psi4/psi4Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/share/cmake/psi4/psi4ConfigVersion.cmake
         DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+

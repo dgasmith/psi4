@@ -196,6 +196,7 @@ add_dependencies(psi4_core ambit_external
                            erd_external
                            gdma_external
                            #gtfock_external
+                           libxc_external
                            libint_external
                            pcmsolver_external
                            pybind11_external)

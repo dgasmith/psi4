@@ -47,6 +47,7 @@ target_link_libraries(core PRIVATE ${LIBC_INTERJECT})
 target_link_libraries(core PRIVATE pybind11::pybind11)
 target_link_libraries(core PRIVATE ${PYTHON_LIBRARIES})
 target_link_libraries(core PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(core PRIVATE ${LIBXC_LIBRARIES})
 # LAPACK & BLAS linking attached to modules in BIN/LIBLIST to maximally defer
 
 target_include_directories(core PRIVATE $<TARGET_PROPERTY:libint::libint,INTERFACE_INCLUDE_DIRECTORIES>)  # comp def instead? only b/c boost export here not w/i mints
