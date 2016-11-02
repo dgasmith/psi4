@@ -41,6 +41,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
 #    - PYTHON_INCLUDE_DIR "Path to the python include files (e.g., /path/to/include/python2.7)"
 #    - SPHINX_ROOT "Root directory for Sphinx: 'bin/sphinx-build' (or similar) should be in this dir."
 #
+#    - LIBXC_ROOT must be set to {TL-psi4}/{objdir}/stage/{CMAKE_INSTALL_PREFIX}/external e.g., -DLIBXC_ROOT="/Users/daniel/Gits/psixc/objdir/stage/usr/local/external"
+#
 #    For any ${AddOn} of: CheMPS2, dkh, libefp, erd, gdma, libint, pybind11
 #    - CMAKE_PREFIX_PATH "Set to list of root directories to look for externally built add-ons and dependencies
 #      (e.g., /path/to/install-libint;/path/to/install-gdma where exists /path/to/install-libint/lib/libderiv.a)"
@@ -192,6 +194,7 @@ ExternalProject_Add(psi4-core
               -DGTFock_DIR=${GTFock_DIR}
               -Dlibint_DIR=${libint_DIR}
               -Dpybind11_DIR=${pybind11_DIR}
+              -DLIBXC_ROOT=${LIBXC_ROOT}
               -DFortran_ENABLED=${Fortran_ENABLED}
               -DLIBC_INTERJECT=${LIBC_INTERJECT}
               -DRESTRICT_KEYWORD=${RESTRICT_KEYWORD}
