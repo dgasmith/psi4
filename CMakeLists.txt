@@ -202,7 +202,8 @@ add_dependencies(psi4_core ambit_external
                            libxc_external
                            libint_external
                            pcmsolver_external
-                           pybind11_external)
+                           pybind11_external
+                           libxc_external)
 add_subdirectory(doc)
 include(ConfigTesting)
 
