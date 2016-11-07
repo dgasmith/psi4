@@ -214,10 +214,10 @@ add_dependencies(psi4-core lapack_external
                            erd_external
                            gdma_external
                            #gtfock_external
-                           libxc_external
                            libint_external
                            pcmsolver_external
-                           pybind11_external)
+                           pybind11_external
+                           libxc_external)
 add_subdirectory(external/downstream)
 add_subdirectory(doc)
 include(ConfigTesting)
