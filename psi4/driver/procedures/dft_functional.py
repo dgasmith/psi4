@@ -2949,7 +2949,7 @@ superfunctionals = {
         'bp86'            : build_bp86_superfunctional,
         'pw91'            : build_pw91_superfunctional,
         'pbe'             : build_pbe_superfunctional,
-        'xcpbe'           : build_XCpbe_superfunctional,
+        # 'xcpbe'           : build_XCpbe_superfunctional,
         'ft97'            : build_ft97_superfunctional,
         'b3lyp'           : build_b3lyp_superfunctional,
         'b3lyp5'          : build_b3lyp5_superfunctional,
