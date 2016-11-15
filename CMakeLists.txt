@@ -43,7 +43,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake
 #
 #    - LIBXC_ROOT must be set to {TL-psi4}/{objdir}/stage/{CMAKE_INSTALL_PREFIX}/external e.g., -DLIBXC_ROOT="/Users/daniel/Gits/psixc/objdir/stage/usr/local/external"
 #
-#    For any ${AddOn} of: CheMPS2, dkh, libefp, erd, gdma, libint, pybind11
+#    For any ${AddOn} of: CheMPS2, dkh, libefp, erd, gdma, libint, pybind11, Libxc
 #    - CMAKE_PREFIX_PATH "Set to list of root directories to look for externally built add-ons and dependencies
 #      (e.g., /path/to/install-libint;/path/to/install-gdma where exists /path/to/install-libint/lib/libderiv.a)"
 #    - ${AddOn}_DIR "Set to directory containing ${AddOn}Config.cmake file to facilitate detection of external build"
@@ -198,7 +198,8 @@ ExternalProject_Add(psi4-core
               -DGTFock_DIR=${GTFock_DIR}
               -Dlibint_DIR=${libint_DIR}
               -Dpybind11_DIR=${pybind11_DIR}
-              -DLIBXC_ROOT=${LIBXC_ROOT}
+              #-DLIBXC_ROOT=${LIBXC_ROOT}
+              -DLibxc_DIR=${Libxc_DIR}
               -DFortran_ENABLED=${Fortran_ENABLED}
               -DLIBC_INTERJECT=${LIBC_INTERJECT}
               -DRESTRICT_KEYWORD=${RESTRICT_KEYWORD}
