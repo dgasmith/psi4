@@ -46,7 +46,7 @@ target_link_libraries(core PRIVATE ${psi4_binmodules})
 target_link_libraries(core PRIVATE ${LIBC_INTERJECT})
 target_link_libraries(core PRIVATE pybind11::pybind11)
 target_link_libraries(core PRIVATE ${PYTHON_LIBRARIES})
-target_link_libraries(core PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(core PRIVATE Threads::Threads)
 #target_link_libraries(core PRIVATE ${LIBXC_LIBRARIES})
 # LAPACK & BLAS linking attached to modules in BIN/LIBLIST to maximally defer
 
