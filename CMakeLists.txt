@@ -203,7 +203,8 @@ ExternalProject_Add(psi4-core
               -Dlibint_DIR=${libint_DIR}
               -DPCMSolver_DIR=${PCMSolver_DIR}
               -Dpybind11_DIR=${pybind11_DIR}
-              -DLIBXC_ROOT=${LIBXC_ROOT}
+              #-DLIBXC_ROOT=${LIBXC_ROOT}
+              -DLibxc_DIR=${Libxc_DIR}
               -DFortran_ENABLED=${Fortran_ENABLED}
               -DLIBC_INTERJECT=${LIBC_INTERJECT}
               -DRESTRICT_KEYWORD=${RESTRICT_KEYWORD}
