@@ -34,6 +34,7 @@ import os
 import math
 from psi4 import core
 from psi4.driver.qcdb import interface_dftd3 as dftd3
+from . import libxc_xc_funcs
 
 ## ==> Functionals <== ##
 
@@ -2941,6 +2942,7 @@ superfunctionals = {
         'vwn5_c'          : build_primitive_superfunctional,
         'vwn3rpa_c'       : build_primitive_superfunctional,
         'vwn3_c'          : build_primitive_superfunctional,
+
         'svwn'            : build_svwn_superfunctional,
         'blyp'            : build_blyp_superfunctional,
         'b86bpbe'         : build_b86bpbe_superfunctional,
@@ -2948,10 +2950,9 @@ superfunctionals = {
         'bp86'            : build_bp86_superfunctional,
         'pw91'            : build_pw91_superfunctional,
         'pbe'             : build_pbe_superfunctional,
-        # 'xcpbe'           : build_XCpbe_superfunctional,
         'ft97'            : build_ft97_superfunctional,
-        'b3lyp'           : build_b3lyp_superfunctional,
-        'b3lyp5'          : build_b3lyp5_superfunctional,
+        # 'b3lyp'           : build_b3lyp_superfunctional,
+        # 'b3lyp5'          : build_b3lyp5_superfunctional,
         'hf_x'            : build_hf_x_superfunctional,
         'pbe0'            : build_pbe0_superfunctional,
         'b97-0'           : build_b970_superfunctional,
@@ -2991,6 +2992,7 @@ superfunctionals = {
         'wpbe2'           : build_wpbe2_superfunctional,
     }
 
+superfunctionals.update(libxc_xc_funcs.libxc_xc_functional_list)
 ## Build up the lost of functionals we can compute
 # Add in plain values
 superfunctional_list = []
@@ -3060,6 +3062,10 @@ def build_superfunctional(alias):
 
     elif name in superfunctionals.keys():
         sup = superfunctionals[name](name, npoints, deriv)
+
+    elif name.upper() in superfunctionals.keys():
+        sup = superfunctionals[name.upper()](name, npoints, deriv)
+
 
 
     elif any(name.endswith(al) for al in dftd3.full_dash_keys):
