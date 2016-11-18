@@ -48,13 +48,17 @@ input.py.dat
 *.clean
 *timer.dat
 *.molden
+*.intco
+*.dma
+*.fchk.dat
+input.py.dat
+
 
 # Special test cases
 tests/*/iter.dat
 tests/*/*.in
 tests/*/*.rst
 tests/*/*/*.h5
-tests/*/*/*.intco
 tests/docs*/*.txt
 tests/pcmsolver/*/*OUT*
 tests/pcmsolver/*/cavity*
