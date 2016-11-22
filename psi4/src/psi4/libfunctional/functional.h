@@ -69,6 +69,8 @@ protected:
     bool meta_;
     // Is LRC?
     bool lrc_;
+    // Unpolarized? (restricted)
+    bool unpolarized_;
 
     // Parameter set
     std::map<std::string, double> parameters_;
@@ -122,6 +124,7 @@ public:
     bool is_meta() const { return meta_; }
     bool is_gga() const { return gga_; }
     bool is_lrc() const { return lrc_; }
+    bool is_unpolarized() const { return unpolarized_; }
 
     double alpha() const { return alpha_; }
     double omega() const { return omega_; }
