@@ -74,6 +74,7 @@ protected:
     std::string name_;
     std::string description_;
     std::string citation_;
+    bool locked_;
 
     // => Exchange-side DFA functionals <= //
 
@@ -96,11 +97,11 @@ protected:
     int deriv_;
     std::map<std::string, SharedVector> values_;
 
-    // The omegas or alphas have changed, we're in a GKS environment.
-    // Update the short-range DFAs
-    void partition_gks();
     // Set up a null Superfunctional
     void common_init();
+
+    // Check if we can edit this Superfunctional
+    void can_edit();
 
 public:
 
@@ -112,6 +113,9 @@ public:
     // Build a blank superfunctional
     static std::shared_ptr<SuperFunctional> blank();
     static std::shared_ptr<SuperFunctional> XC_build(std::string name, bool unpolarized);
+
+    // Builds a worker version of the superfunctional
+    std::shared_ptr<SuperFunctional> build_worker();
 
     // Allocate values (MUST be called after adding new functionals to the superfunctional)
     void allocate();
@@ -142,6 +146,7 @@ public:
 
     // => Setters <= //
 
+    void set_lock(bool locked) { locked_ = locked; }
     void set_name(const std::string & name) { name_ = name; }
     void set_description(const std::string & description) { description_ = description; }
     void set_citation(const std::string & citation) { citation_ = citation; }
