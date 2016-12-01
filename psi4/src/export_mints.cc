@@ -891,6 +891,9 @@ void export_mints(py::module& m)
             def("form_C", &scf::HF::form_C, "docstring").
             def("form_D", &scf::HF::form_D, "docstring").
             def("form_V", &scf::HF::form_V, "docstring").
+            def("onel_Hx", &scf::HF::onel_Hx, "docstring").
+            def("twoel_Hx", &scf::HF::twoel_Hx, "docstring").
+            def("cphf_Hx", &scf::HF::cphf_Hx, "docstring").
             def("guess_Ca", &scf::HF::guess_Ca, "docstring").
             def("guess_Cb", &scf::HF::guess_Cb, "docstring").
             def("reset_occ", &scf::HF::reset_occ, "docstring").
