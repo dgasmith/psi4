@@ -136,6 +136,7 @@ public:
 
     /// Throws by default
     virtual SharedMatrix compute_gradient();
+    virtual SharedMatrix compute_hessian();
 
     void set_print(int print) { print_ = print; }
     void set_debug(int debug) { debug_ = debug; }
@@ -166,6 +167,7 @@ public:
     virtual void finalize();
 
     virtual SharedMatrix compute_gradient();
+    virtual SharedMatrix compute_hessian();
 
     virtual void print_header() const;
 };
