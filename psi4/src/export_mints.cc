@@ -199,92 +199,6 @@ void export_mints(py::module& m)
     typedef void (Matrix::*matrix_load)(const std::string&);
     typedef const Dimension& (Matrix::*matrix_ret_dimension)() const;
 
-<<<<<<< 325fb1cc2422e8db2682223e9ea7a81e10e375ac
-    py::class_<Matrix, std::shared_ptr<Matrix>>(m, "Matrix", "docstring", py::dynamic_attr()).
-            def(py::init<int, int>()).
-            def(py::init<const std::string&, int, int>()).
-            def(py::init<const std::string&, const Dimension&, const Dimension&>()).
-            def(py::init<const std::string&>()).
-            def("clone", &Matrix::clone, "docstring").
-            def_property("name",
-                         py::cpp_function(&Matrix::name),
-                         py::cpp_function(&Matrix::set_name),
-                         "The name of the Matrix. Used in printing.").
-            // def("set_name", &Matrix::set_name, "docstring").
-            // def("name", &Matrix::name, py::return_value_policy::copy, "docstring").
-            def("print_out", &Matrix::print_out, "docstring").
-            def("rows", &Matrix::rowdim, "docstring").
-            def("cols", &Matrix::coldim, "docstring").
-            def("rowdim", matrix_ret_dimension(&Matrix::rowspi), py::return_value_policy::copy, "docstring").
-            def("coldim", matrix_ret_dimension(&Matrix::colspi), py::return_value_policy::copy, "docstring").
-            def("nirrep", &Matrix::nirrep, py::return_value_policy::copy, "docstring").
-            def("symmetry", &Matrix::symmetry, py::return_value_policy::copy, "docstring").
-            def("identity", &Matrix::identity, "docstring").
-            def("copy_lower_to_upper", &Matrix::copy_lower_to_upper, "docstring").
-            def("copy_upper_to_lower", &Matrix::copy_upper_to_lower, "docstring").
-            def("zero_lower", &Matrix::zero_lower, "docstring").
-            def("zero_upper", &Matrix::zero_upper, "docstring").
-            def("zero", &Matrix::zero, "docstring").
-            def("zero_diagonal", &Matrix::zero_diagonal, "docstring").
-            def("trace", &Matrix::trace, "docstring").
-            //            def("transpose", &Matrix::transpose).
-            def("add", matrix_one(&Matrix::add), "docstring").
-            def("axpy", &Matrix::axpy, "docstring").
-            def("subtract", matrix_one(&Matrix::subtract), "docstring").
-            def("accumulate_product", matrix_two(&Matrix::accumulate_product), "docstring").
-            def("scale", &Matrix::scale, "docstring").
-            def("sum_of_squares", &Matrix::sum_of_squares, "docstring").
-            def("add_and_orthogonalize_row", &Matrix::add_and_orthogonalize_row, "docstring").
-            def("rms", &Matrix::rms, "docstring").
-            def("absmax", &Matrix::absmax, "docstring").
-            def("scale_row", &Matrix::scale_row, "docstring").
-            def("scale_column", &Matrix::scale_column, "docstring").
-            def("transform", matrix_one(&Matrix::transform), "docstring").
-            def("transform", matrix_two(&Matrix::transform), "docstring").
-            def("transform", matrix_one(&Matrix::back_transform), "docstring").
-            def("back_transform", matrix_two(&Matrix::back_transform), "docstring").
-            def("vector_dot", double_matrix_one(&Matrix::vector_dot), "docstring").
-            def("gemm", matrix_multiply(&Matrix::gemm), "docstring").
-            def("diagonalize", matrix_diagonalize(&Matrix::diagonalize), "docstring").
-            def("cholesky_factorize", &Matrix::cholesky_factorize, "docstring").
-            def("partial_cholesky_factorize", &Matrix::partial_cholesky_factorize, "docstring").
-            //def("canonical_orthogonalization", &Matrix::canonical_orthogonalization, CanonicalOrthog()).
-            // def("canonical_orthogonalization", &Matrix::canonical_orthogonalization, py::arg("delta") = 0.0, py::arg("eigvec") = SharedMatrix()).
-            def("schmidt", &Matrix::schmidt).
-            def("invert", &Matrix::invert, "docstring").
-            def("apply_denominator", matrix_one(&Matrix::apply_denominator), "docstring").
-            def("copy", matrix_one(&Matrix::copy), "docstring").
-            def("power", &Matrix::power, "docstring").
-            // def("doublet", &Matrix::doublet, py::arg("transA") = false, py::arg("transB") = false).
-            // def("triplet", &Matrix::triplet, py::arg("transA") = false, py::arg("transB") = false,
-            //                                  py::arg("transC") = false, "docstring").
-            def("doublet", &Matrix::doublet, "docstring").
-            def("triplet", &Matrix::triplet, "docstring").
-            def("get", matrix_get3(&Matrix::get), "docstring").
-            def("get", matrix_get2(&Matrix::get), "docstring").
-            def("set", matrix_set1(&Matrix::set), "docstring").
-            def("set", matrix_set3(&Matrix::set), "docstring").
-            def("set", matrix_set4(&Matrix::set), "docstring").
-            def("set", &Matrix::set_by_python_list, "docstring").
-            def("project_out", &Matrix::project_out, "docstring").
-            def("__getitem__", &Matrix::pyget, "docstring").
-            def("__setitem__", &Matrix::pyset, "docstring").
-            def("save", matrix_save(&Matrix::save), "docstring").
-            def("load", matrix_load(&Matrix::load), "docstring").
-            def("load_mpqc", matrix_load(&Matrix::load_mpqc), "docstring").
-            def("remove_symmetry", &Matrix::remove_symmetry, "docstring").
-            def("symmetrize_gradient", &Matrix::symmetrize_gradient, "docstring").
-            def("rotate_columns", &Matrix::rotate_columns, "docstring").
-            def("array_interface", [](Matrix &m){
-                // Dont ask, hopefully pybind11 will work on this
-                py::list ret;
-                std::vector<py::buffer_info> buff_vec(m.array_interface());
-                std::string typestr = "<";
-                {
-                   std::stringstream sstr;
-                   sstr << (int)sizeof(double);
-                   typestr += "f" + sstr.str();
-=======
     py::class_<Matrix, std::shared_ptr<Matrix>>(m, "Matrix", "docstring", py::dynamic_attr())
         .def(py::init<int, int>())
         .def(py::init<const std::string&, int, int>())
@@ -1000,8 +914,6 @@ void export_mints(py::module& m)
         .def("clear", &ExternalPotential::clear, "docstring")
         .def("computePotentialMatrix", &ExternalPotential::computePotentialMatrix, "docstring")
         .def("print_out", &ExternalPotential::py_print, "docstring");
-
-
 
     typedef std::shared_ptr<Localizer>(*localizer_with_type)(
         const std::string&, std::shared_ptr<BasisSet>, std::shared_ptr<Matrix>);
