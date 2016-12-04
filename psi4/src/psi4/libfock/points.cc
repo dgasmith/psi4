@@ -96,11 +96,11 @@ void RKSFunctions::allocate()
         // point_values_["LAPL_RHO_A"] = std::shared_ptr<Vector>(new Vector("LAPL_RHO_A", max_points_));
         // point_values_["LAPL_RHO_B"] = point_values_["LAPL_RHO_A"];
     }
+    build_temps();
 }
 void RKSFunctions::set_pointers(SharedMatrix D_AO)
 {
     D_AO_ = D_AO;
-    build_temps();
 }
 void RKSFunctions::set_pointers(SharedMatrix /*Da_AO*/, SharedMatrix /*Db_AO*/)
 {
@@ -370,6 +370,7 @@ void UKSFunctions::allocate()
         point_values_["TAU_A"] = std::shared_ptr<Vector>(new Vector("TAU_A", max_points_));
         point_values_["TAU_B"] = std::shared_ptr<Vector>(new Vector("TAU_A", max_points_));
     }
+    build_temps();
 }
 void UKSFunctions::set_pointers(SharedMatrix /*Da_AO*/)
 {
@@ -379,7 +380,6 @@ void UKSFunctions::set_pointers(SharedMatrix Da_AO, SharedMatrix Db_AO)
 {
     Da_AO_ = Da_AO;
     Db_AO_ = Db_AO;
-    build_temps();
 }
 void UKSFunctions::compute_points(std::shared_ptr<BlockOPoints> block)
 {
