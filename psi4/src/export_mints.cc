@@ -29,9 +29,6 @@
 #include "psi4/libfock/jk.h"
 #include "psi4/libfock/soscf.h"
 
-#include "psi4/detci/ciwave.h"
-#include "psi4/detci/civect.h"
-
 #include "psi4/libmints/deriv.h"
 #include "psi4/libmints/twobody.h"
 #include "psi4/libmints/integralparameters.h"
@@ -76,6 +73,11 @@
 #include "psi4/libscf_solver/cuhf.h"
 #include "psi4/libfunctional/superfunctional.h"
 #include "psi4/libfock/v.h"
+
+#include "psi4/dfep2/dfep2.h"
+
+#include "psi4/detci/ciwave.h"
+#include "psi4/detci/civect.h"
 
 #include "psi4/libpsio/psio.h"
 #include "psi4/libpsio/psio.hpp"
@@ -225,10 +227,10 @@ void export_mints(py::module& m)
         .def("clone", &Matrix::clone, "docstring")
         .def_property("name", py::cpp_function(&Matrix::name), py::cpp_function(&Matrix::set_name),
                       "The name of the Matrix. Used in printing.")
-        .
+
         // def("set_name", &Matrix::set_name, "docstring").
         // def("name", &Matrix::name, py::return_value_policy::copy, "docstring").
-        def("print_out", &Matrix::print_out, "docstring")
+        .def("print_out", &Matrix::print_out, "docstring")
         .def("rows", &Matrix::rowdim, "docstring")
         .def("cols", &Matrix::coldim, "docstring")
         .def("rowdim", matrix_ret_dimension(&Matrix::rowspi), py::return_value_policy::copy,
@@ -245,9 +247,9 @@ void export_mints(py::module& m)
         .def("zero", &Matrix::zero, "docstring")
         .def("zero_diagonal", &Matrix::zero_diagonal, "docstring")
         .def("trace", &Matrix::trace, "docstring")
-        .
-        //            def("transpose", &Matrix::transpose).
-        def("add", matrix_one(&Matrix::add), "docstring")
+
+        .def("transpose_this", &Matrix::transpose_this)
+        .def("add", matrix_one(&Matrix::add), "docstring")
         .def("axpy", &Matrix::axpy, "docstring")
         .def("subtract", matrix_one(&Matrix::subtract), "docstring")
         .def("accumulate_product", matrix_two(&Matrix::accumulate_product), "docstring")
@@ -267,21 +269,21 @@ void export_mints(py::module& m)
         .def("diagonalize", matrix_diagonalize(&Matrix::diagonalize), "docstring")
         .def("cholesky_factorize", &Matrix::cholesky_factorize, "docstring")
         .def("partial_cholesky_factorize", &Matrix::partial_cholesky_factorize, "docstring")
-        .
+
         // def("canonical_orthogonalization", &Matrix::canonical_orthogonalization,
         // CanonicalOrthog()).
         // def("canonical_orthogonalization", &Matrix::canonical_orthogonalization, py::arg("delta")
         // = 0.0, py::arg("eigvec") = SharedMatrix()).
-        def("schmidt", &Matrix::schmidt)
+        .def("schmidt", &Matrix::schmidt)
         .def("invert", &Matrix::invert, "docstring")
         .def("apply_denominator", matrix_one(&Matrix::apply_denominator), "docstring")
         .def("copy", matrix_one(&Matrix::copy), "docstring")
         .def("power", &Matrix::power, "docstring")
-        .
+
         // def("doublet", &Matrix::doublet, py::arg("transA") = false, py::arg("transB") = false).
         // def("triplet", &Matrix::triplet, py::arg("transA") = false, py::arg("transB") = false,
         //                                  py::arg("transC") = false, "docstring").
-        def("doublet", &Matrix::doublet, "docstring")
+        .def("doublet", &Matrix::doublet, "docstring")
         .def("triplet", &Matrix::triplet, "docstring")
         .def("get", matrix_get3(&Matrix::get), "docstring")
         .def("get", matrix_get2(&Matrix::get), "docstring")
@@ -581,7 +583,7 @@ void export_mints(py::module& m)
         .def("ao_potential", oneelectron(&MintsHelper::ao_potential), "docstring")
         .def("ao_potential", oneelectron_mixed_basis(&MintsHelper::ao_potential), "docstring")
         .def("so_potential", &MintsHelper::so_potential, "docstring")
-        
+
 
         // One-electron properties and
         .def("ao_pvp", &MintsHelper::ao_pvp, "docstring")
@@ -611,7 +613,7 @@ void export_mints(py::module& m)
         .def("ao_f12_double_commutator", &MintsHelper::ao_f12_double_commutator, "docstring")
         .def("ao_3coverlap", normal_eri(&MintsHelper::ao_3coverlap), "docstring")
         .def("ao_3coverlap", normal_3c(&MintsHelper::ao_3coverlap), "docstring")
-        
+
 
         // Two-electron MO and transformers
         .def("mo_eri", eri(&MintsHelper::mo_eri), "docstring")
@@ -653,12 +655,12 @@ void export_mints(py::module& m)
         .def(py::init<double>())
         .def(py::init<double, double, double>())
         .def(py::init<const Vector3&>())
-        
+
         //      def(self = other<double>()).
         .def(py::self += py::self)
         .def(py::self -= py::self)
         .def(py::self *= double())
-        
+
         // def(py::self + py::self).
         // def(py::self - py::self).
         // def(-py::self).
@@ -1088,6 +1090,12 @@ void export_mints(py::module& m)
 
     py::class_<scf::CUHF, std::shared_ptr<scf::CUHF>, scf::HF>(m, "CUHF", "docstring")
         .def(py::init<std::shared_ptr<Wavefunction>, std::shared_ptr<SuperFunctional>>());
+
+    py::class_<dfep2::DFEP2Wavefunction, std::shared_ptr<dfep2::DFEP2Wavefunction>, Wavefunction>(
+        m, "DFEP2Wavefunction", "A density-fitted second-order Electron Propagator Wavefunction.")
+        .def(py::init<std::shared_ptr<Wavefunction>>())
+        .def("compute", &dfep2::DFEP2Wavefunction::compute,
+             "Computes the density-fitted EP2 energy for the input orbitals");
 
     typedef std::shared_ptr<Localizer>(*localizer_with_type)(
         const std::string&, std::shared_ptr<BasisSet>, std::shared_ptr<Matrix>);
