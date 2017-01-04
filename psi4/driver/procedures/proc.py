@@ -1020,7 +1020,7 @@ def scf_wavefunction_factory(reference, ref_wfn, functional=None):
                                                                               tuple_params = modified_disp_params)
         wfn._disp_functor.print_out()
 
-    # Set the multitude of SAD basis sets
+    # Set the DF basis sets
     if (core.get_option("SCF", "SCF_TYPE") == "DF") or \
        (core.get_option("SCF", "DF_SCF_GUESS") and (core.get_option("SCF", "SCF_TYPE") == "DIRECT")):
         aux_basis = core.BasisSet.build(wfn.molecule(), "DF_BASIS_SCF",
@@ -1029,6 +1029,7 @@ def scf_wavefunction_factory(reference, ref_wfn, functional=None):
                                         puream=wfn.basisset().has_puream())
         wfn.set_basisset("DF_BASIS_SCF", aux_basis)
 
+    # Set the relativistic basis sets
     if core.get_global_option("RELATIVISTIC") in ["X2C", "DKH"]:
         decon_basis = core.BasisSet.build(wfn.molecule(), "BASIS_RELATIVISTIC",
                                         core.get_option("SCF", "BASIS_RELATIVISTIC"),
@@ -1036,6 +1037,7 @@ def scf_wavefunction_factory(reference, ref_wfn, functional=None):
                                         puream=wfn.basisset().has_puream())
         wfn.set_basisset("BASIS_RELATIVISTIC", decon_basis)
 
+    # Set the multitude of SAD basis sets
     if (core.get_option("SCF", "GUESS") == "SAD"):
         sad_basis_list = core.BasisSet.build(wfn.molecule(), "ORBITAL",
                                              core.get_global_option("BASIS"),
@@ -1082,6 +1084,7 @@ def scf_helper(name, **kwargs):
     scf_molecule = kwargs.get('molecule', core.get_active_molecule())
     read_orbitals = core.get_option('SCF', 'GUESS') is "READ"
     ref_wfn = kwargs.pop('ref_wfn', None)
+    ref_func = kwargs.pop('functional', None)
     if ref_wfn is not None:
         raise Exception("Cannot supply a SCF wavefunction a ref_wfn.")
 
@@ -1193,7 +1196,8 @@ def scf_helper(name, **kwargs):
     if cast or do_broken:
         # Cast or broken are special cases
         base_wfn = core.Wavefunction.build(scf_molecule, core.get_global_option('BASIS'))
-        ref_wfn = scf_wavefunction_factory(core.get_option('SCF', 'REFERENCE'), base_wfn)
+        ref_wfn = scf_wavefunction_factory(core.get_option('SCF', 'REFERENCE'), base_wfn,
+                                           functional=ref_func)
         core.set_legacy_wavefunction(ref_wfn)
 
         # Compute dftd3
@@ -1239,7 +1243,8 @@ def scf_helper(name, **kwargs):
 
     # the SECOND scf call
     base_wfn = core.Wavefunction.build(scf_molecule, core.get_global_option('BASIS'))
-    scf_wfn = scf_wavefunction_factory(core.get_option('SCF', 'REFERENCE'), base_wfn)
+    scf_wfn = scf_wavefunction_factory(core.get_option('SCF', 'REFERENCE'), base_wfn,
+                                       functional=ref_func)
     core.set_legacy_wavefunction(scf_wfn)
 
     read_filename = core.get_writer_file_prefix(scf_molecule.name()) + ".180.npz"
