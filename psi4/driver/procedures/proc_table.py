@@ -31,6 +31,7 @@ chemical methods.
 from __future__ import print_function
 from __future__ import absolute_import
 
+from . import sapt
 from . import proc
 from . import interface_cfour
 # never import wrappers or aliases into this file
@@ -63,6 +64,7 @@ procedures = {
             'dfocc'         : proc.run_dfocc,  # full control over dfocc
             'qchf'          : proc.run_qchf,
             'ccd'           : proc.run_dfocc,
+            'sapt(dft)'     : sapt.run_sapt_dft,
             'sapt0'         : proc.run_sapt,
             'ssapt0'        : proc.run_sapt,
             'sapt2'         : proc.run_sapt,
