@@ -280,9 +280,11 @@ void export_mints(py::module& m)
         .def("copy", matrix_one(&Matrix::copy), "docstring")
         .def("power", &Matrix::power, "docstring")
 
-        // def("doublet", &Matrix::doublet, py::arg("transA") = false, py::arg("transB") = false).
-        // def("triplet", &Matrix::triplet, py::arg("transA") = false, py::arg("transB") = false,
-        //                                  py::arg("transC") = false, "docstring").
+        // .def("doublet", &Matrix::doublet, "docstring", py::arg("A"), py::arg("B"),
+        //      py::arg("transA") = false, py::arg("transB") = false)
+        // .def("triplet", &Matrix::triplet, "docstring", py::arg("A"), py::arg("B"), py::arg("C"),
+        //      py::arg("transA") = false, py::arg("transB") = false, py::arg("transC") = false)
+
         .def("doublet", &Matrix::doublet, "docstring")
         .def("triplet", &Matrix::triplet, "docstring")
         .def("get", matrix_get3(&Matrix::get), "docstring")
@@ -484,10 +486,10 @@ void export_mints(py::module& m)
                       std::shared_ptr<BasisSet>, std::shared_ptr<BasisSet>>())
         .def(py::init<std::shared_ptr<BasisSet>, std::shared_ptr<BasisSet>>())
         .def(py::init<std::shared_ptr<BasisSet>>())
-        .
+
         // def("shells_iterator", &IntegralFactory::shells_iterator_ptr,
         // py::return_value_policy<manage_new_object>(), "docstring").
-        def("shells_iterator", &IntegralFactory::shells_iterator_ptr, "docstring")
+        .def("shells_iterator", &IntegralFactory::shells_iterator_ptr, "docstring")
         .def("eri", &IntegralFactory::eri, "docstring", py::arg("deriv") = 0,
              py::arg("use_shell_pairs") = true)
         .def("f12", &IntegralFactory::f12, "docstring", py::arg("cf"), py::arg("deriv") = 0,
@@ -692,9 +694,7 @@ void export_mints(py::module& m)
         .def("sigma_xy", &SymmetryOperation::sigma_xy, "Set equal to reflection in xy plane")
         .def("sigma_yz", &SymmetryOperation::sigma_yz, "Set equal to reflection in yz plane")
         .def("sigma_xz", &SymmetryOperation::sigma_xz, "Set equal to reflection in xz plane")
-        .
-        //        def("sigma_yz", &SymmetryOperation::sigma_yz).
-        def("rotate_n", intFunction(&SymmetryOperation::rotation),
+        .def("rotate_n", intFunction(&SymmetryOperation::rotation),
             "Set equal to a clockwise rotation by 2pi/n")
         .def("rotate_theta", doubleFunction(&SymmetryOperation::rotation),
              "Set equal to a clockwise rotation by theta")
@@ -765,9 +765,7 @@ void export_mints(py::module& m)
         .def("x", &Molecule::x, "x position of atom")
         .def("y", &Molecule::y, "y position of atom")
         .def("z", &Molecule::z, "z position of atom")
-        .
-        // def("xyz", &Molecule::xyz).
-        def("center_of_mass", &Molecule::center_of_mass,
+        .def("center_of_mass", &Molecule::center_of_mass,
             "Computes center of mass of molecule (does not translate molecule)")
         .def("translate", &Molecule::translate, "Translates molecule by arg2")
         .def("move_to_com", &Molecule::move_to_com, "Moves molecule to center of mass")
@@ -856,10 +854,7 @@ void export_mints(py::module& m)
              "Sets basis set arg3 to all atoms with symbol (e.g., H) arg2")
         .def("set_basis_by_label", &Molecule::set_basis_by_label,
              "Sets basis set arg3 to all atoms with label (e.g., H4) arg2")
-        .
-        // def("set_basis_by_number", &Molecule::set_basis_by_number, "Sets basis set arg3 to atom
-        // number (1-indexed, incl. dummies) arg2").  // dangerous for user use
-        def("irrep_labels",
+        .def("irrep_labels",
             [](Molecule& mol) {
                 std::vector<std::string> ret;
                 char** labels = mol.irrep_labels();
@@ -911,9 +906,7 @@ void export_mints(py::module& m)
         .def_static("make_filename", &BasisSet::make_filename,
                     "Returns filename for basis name: pluses, stars, parentheses replaced and gbs "
                     "extension added")
-        .
-        //            def_static("construct", &BasisSet::construct, "docstring").
-        def_static("zero_ao_basis_set", &BasisSet::zero_ao_basis_set,
+        .def_static("zero_ao_basis_set", &BasisSet::zero_ao_basis_set,
                    "Returns a BasisSet object that actually has a single s-function at the origin "
                    "with an exponent of 0.0 and contraction of 1.0.")
         .def("nbf", &BasisSet::nbf,
@@ -934,9 +927,7 @@ void export_mints(py::module& m)
         .def("function_to_center", &BasisSet::function_to_center,
              "Given a function number, return the number of the center it is on.")
         .def("nshell_on_center", &BasisSet::nshell_on_center, "docstring")
-        .
-        //            def("decontract", &BasisSet::decontract, "docstring").
-        def("ao_to_shell", &BasisSet::ao_to_shell, "docstring")
+        .def("ao_to_shell", &BasisSet::ao_to_shell, "docstring")
         .def("max_function_per_shell", &BasisSet::max_function_per_shell, "docstring")
         .def("max_nprimitive", &BasisSet::max_nprimitive, "docstring")
         .def_static("construct_from_pydict", &BasisSet::construct_from_pydict, "docstring");
