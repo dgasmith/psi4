@@ -79,6 +79,8 @@
 #include "psi4/detci/ciwave.h"
 #include "psi4/detci/civect.h"
 
+#include "psi4/fisapt/fisapt.h"
+
 #include "psi4/libpsio/psio.h"
 #include "psi4/libpsio/psio.hpp"
 
@@ -249,6 +251,7 @@ void export_mints(py::module& m)
         .def("trace", &Matrix::trace, "docstring")
 
         .def("transpose_this", &Matrix::transpose_this)
+        .def("transpose", &Matrix::transpose)
         .def("add", matrix_one(&Matrix::add), "docstring")
         .def("axpy", &Matrix::axpy, "docstring")
         .def("subtract", matrix_one(&Matrix::subtract), "docstring")
@@ -276,6 +279,7 @@ void export_mints(py::module& m)
         // = 0.0, py::arg("eigvec") = SharedMatrix()).
         .def("schmidt", &Matrix::schmidt)
         .def("invert", &Matrix::invert, "docstring")
+        .def("general_invert", &Matrix::general_invert, "docstring")
         .def("apply_denominator", matrix_one(&Matrix::apply_denominator), "docstring")
         .def("copy", matrix_one(&Matrix::copy), "docstring")
         .def("power", &Matrix::power, "docstring")
@@ -1087,6 +1091,14 @@ void export_mints(py::module& m)
         .def(py::init<std::shared_ptr<Wavefunction>>())
         .def("compute", &dfep2::DFEP2Wavefunction::compute,
              "Computes the density-fitted EP2 energy for the input orbitals");
+
+    py::class_<fisapt::FISAPT, std::shared_ptr<fisapt::FISAPT>>(m, "FISAPT",
+                                                                "A Fragment-SAPT Wavefunction")
+        .def(py::init<std::shared_ptr<Wavefunction>>())
+        .def("compute_energy", &fisapt::FISAPT::compute_energy, "Computes the FSAPT energy.")
+        .def("scalars", &fisapt::FISAPT::scalars, "Return the interally computed scalars.")
+        .def("disp", &fisapt::FISAPT::disp,
+             "Computes the MP2-based DispE20 and Exch-DispE20 energy.");
 
     typedef std::shared_ptr<Localizer>(*localizer_with_type)(
         const std::string&, std::shared_ptr<BasisSet>, std::shared_ptr<Matrix>);
