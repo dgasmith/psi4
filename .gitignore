@@ -85,6 +85,8 @@ debug
 debug_latest
 *.sh
 TEST
+*/test.py
+*/test.dat
 
 # Other random files people have added.
 svn_source
