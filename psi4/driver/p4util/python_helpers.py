@@ -208,6 +208,11 @@ def set_module_options(module, options_dict):
     for k, v, in options_dict.items():
         core.set_local_option(module.upper(), k.upper(), v)
 
+## OEProp helpers
 
 
-
+core.OEProp.valid_methods = [
+    'DIPOLE', 'QUADRUPOLE', 'MULLIKEN_CHARGES', 'LOWDIN_CHARGES', 'WIBERG_LOWDIN_INDICES',
+    'MAYER_INDICES', 'MAYER_INDICES', 'MO_EXTENTS', 'GRID_FIELD', 'GRID_ESP', 'ESP_AT_NUCLEI',
+    'NO_OCCUPATIONS'
+]
