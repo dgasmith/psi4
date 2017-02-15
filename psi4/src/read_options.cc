@@ -916,6 +916,29 @@ int read_options(const std::string &name, Options & options, bool suppress_print
     /*- Proportion of memory available for the DF-MP2 three-index integral
         buffers used to evaluate dispersion. !expert -*/
     options.add_double("SAPT_MEM_FACTOR", 0.9);
+
+
+    /*- SUBSECTION SAPT(DFT) -*/
+
+    /*- How is the GRAC correction determined? -*/
+    options.add_str("SAPT_DFT_GRAC_DETERMINATION", "INPUT", "INPUT");
+    /*- Monomer A GRAC shift? -*/
+    options.add_double("SAPT_DFT_GRAC_SHIFT_A", 0.0);
+    /*- Monomer B GRAC shift? -*/
+    options.add_double("SAPT_DFT_GRAC_SHIFT_B", 0.0);
+    /*- Compute the Delta-HF correction? -*/
+    options.add_bool("SAPT_DFT_DO_DHF", true);
+    /*- Underlying funcitonal to use for SAPT(DFT) !expert -*/
+    options.add_str("SAPT_DFT_FUNCTIONAL", "PBE0", "");
+    /*- Number of points in the Legendre FDDS Dispersion time integration !expert -*/
+    options.add_int("SAPT_FDDS_DISP_NUM_POINTS", 10);
+    /*- Lambda shift in the space morphing for the FDDS Dispersion time integration !expert -*/
+    options.add_double("SAPT_FDDS_DISP_LEG_LAMBDA", 0.3);
+    /*- Which MP2 Exch-Disp module to use? !expert -*/
+    options.add_str("SAPT_DFT_MP2_DISP_ALG", "SAPT", "FISAPT SAPT");
+    /*- Interior option to clean up printing !expert -*/
+    options.add_bool("SAPT_QUIET", false);
+
   }
 
   if (name == "FISAPT"|| options.read_globals()) {
@@ -1411,6 +1434,18 @@ int read_options(const std::string &name, Options & options, bool suppress_print
     options.add_double("DFT_OMEGA_C", 0.0);
     /*- The DFT Correlation hybrid parameter -*/
     options.add_double("DFT_ALPHA_C", 0.0);
+    /*- Minima rho cutoff for the second derivative -*/
+    options.add_double("DFT_V2_RHO_CUTOFF", 1.e-6);
+    /*- The gradient regularized asymptotic correction shift value -*/
+    options.add_double("DFT_GRAC_SHIFT", 0.0);
+    /*- The gradient regularized asymptotic correction alpha value -*/
+    options.add_double("DFT_GRAC_ALPHA", 0.5);
+    /*- The gradient regularized asymptotic correction beta value -*/
+    options.add_double("DFT_GRAC_BETA", 40.0);
+    /*- The gradient regularized asymptotic correction functional exch form. !expert -*/
+    options.add_str("DFT_GRAC_X_FUNC", "XC_GGA_X_LB");
+    /*- The gradient regularized asymptotic correction functional corr form. !expert -*/
+    options.add_str("DFT_GRAC_C_FUNC", "XC_LDA_C_VWN");
     /*- Number of spherical points (A :ref:`Lebedev Points <table:lebedevorder>` number). -*/
     options.add_int("DFT_SPHERICAL_POINTS", 302);
     /*- Number of radial points. -*/
@@ -1432,9 +1467,9 @@ int read_options(const std::string &name, Options & options, bool suppress_print
     /*- Spread alpha for logarithmic pruning. !expert -*/
     options.add_double("DFT_PRUNING_ALPHA",1.0);
     /*- The maximum number of grid points per evaluation block. !expert -*/
-    options.add_int("DFT_BLOCK_MAX_POINTS",5000);
+    options.add_int("DFT_BLOCK_MAX_POINTS",200);
     /*- The minimum number of grid points per evaluation block. !expert -*/
-    options.add_int("DFT_BLOCK_MIN_POINTS",1000);
+    options.add_int("DFT_BLOCK_MIN_POINTS",100);
     /*- The maximum radius to terminate subdivision of an octree block [au]. !expert -*/
     options.add_double("DFT_BLOCK_MAX_RADIUS",3.0);
     /*- The blocking scheme for DFT. !expert -*/
@@ -1444,6 +1479,12 @@ int read_options(const std::string &name, Options & options, bool suppress_print
     :ref:`Dispersion Corrections <table:dashd>` for the order in which
     parameters are to be specified in this array option. -*/
     options.add("DFT_DISPERSION_PARAMETERS", new ArrayType());
+    /*- Number of spherical points (A :ref:`Lebedev Points <table:lebedevorder>` number) for VV10 NL integration. -*/
+    options.add_int("DFT_VV10_SPHERICAL_POINTS", 50);
+    /*- Number of radial points for VV10 NL integration. -*/
+    options.add_int("DFT_VV10_RADIAL_POINTS", 20);
+    /*- Rho cutoff for VV10 NL integration. !expert -*/
+    options.add_double("DFT_VV10_RHO_CUTOFF", 1.e-8);
     /*- The convergence on the orbital localization procedure -*/
     options.add_double("LOCAL_CONVERGENCE",1E-12);
     /*- The maxiter on the orbital localization procedure -*/
@@ -2172,9 +2213,28 @@ int read_options(const std::string &name, Options & options, bool suppress_print
     /*- Do compute one-particle density matrix? -*/
     options.add_bool("ONEPDM",false);
   }
+  if(name == "DFEP2"|| options.read_globals()) {
+    /*- MODULEDESCRIPTION Performs density-fitted EP2 computations for RHF reference wavefunctions. -*/
+
+      /*- Auxiliary basis set for EP2 density fitting computations.
+      :ref:`Defaults <apdx:basisFamily>` to a RI basis. -*/
+      options.add_str("DF_BASIS_EP2", "");
+      /*- Number of Ionization Potentials to compute, starting with the HOMO. -*/
+      options.add_int("EP2_NUM_IP", 3);
+      /*- Number of Electron Affinities to compute, starting with the LUMO. -*/
+      options.add_int("EP2_NUM_EA", 0);
+      /*- Explicitly pick orbitals to use in the EP2 method, overrides EP2_NUM_ options. Input
+         array should be [[orb1, orb2], [], ...] for each irrep. -*/
+      options.add("EP2_ORBITALS", new ArrayType());
+      /*- What is the maximum number of iterations? -*/
+      options.add_double("EP2_CONVERGENCE", 5.e-5);
+      /*- What is the maximum number of iterations? -*/
+      options.add_int("EP2_MAXITER", 20);
+  }
   if(name == "PSIMRCC"|| options.read_globals()) {
-    /*- MODULEDESCRIPTION Performs multireference coupled cluster computations.  This theory should be used only by
-        advanced users with a good working knowledge of multireference techniques. -*/
+      /*- MODULEDESCRIPTION Performs multireference coupled cluster computations.  This theory
+         should be used only by advanced users with a good working knowledge of multireference
+         techniques. -*/
 
     /*- The multiplicity, $M@@S(M@@S+1)$, of the target state.  Must be specified if different from the reference $M@@s$. -*/
       options.add_int("CORR_MULTP",1);

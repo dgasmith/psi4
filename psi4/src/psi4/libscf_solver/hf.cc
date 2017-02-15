@@ -353,6 +353,11 @@ void HF::common_init()
         potential_ = VBase::build_V(basisset_, functional_, options_, (options_.get_str("REFERENCE") == "RKS" ? "RV" : "UV"));
         potential_->initialize();
 
+        // Do the GRAC
+        if (options_.get_double("DFT_GRAC_SHIFT") != 0.0){
+            potential_->set_grac_shift(options_.get_double("DFT_GRAC_SHIFT"));
+        }
+
         // Print the KS-specific stuff
         potential_->print_header();
     } else {
@@ -363,6 +368,10 @@ void HF::common_init()
     variables_["-D Energy"] = 0.0;
     energies_["-D"] = 0.0;
 
+    // CPHF info
+    cphf_nfock_builds_ = 0;
+    cphf_converged_ = false;
+
     // Initialize PCM object, if requested
 #ifdef USING_PCMSolver
     if(pcm_enabled_ = (options_.get_bool("PCM")))
@@ -370,31 +379,42 @@ void HF::common_init()
 #endif
 }
 
-void HF::damp_update()
-{
-    throw PSIEXCEPTION("Sorry, damping has not been implemented for this "
-                       "type of SCF wavefunction yet.");
+void HF::damp_update() {
+    throw PSIEXCEPTION(
+        "Sorry, damping has not been implemented for this "
+        "type of SCF wavefunction yet.");
 }
 
-int HF::soscf_update()
-{
-    throw PSIEXCEPTION("Sorry, second-order convergence has not been implemented for this "
-                       "type of SCF wavefunction yet.");
+int HF::soscf_update() {
+    throw PSIEXCEPTION(
+        "Sorry, second-order convergence has not been implemented for this "
+        "type of SCF wavefunction yet.");
 }
-void HF::form_V()
-{
-    throw PSIEXCEPTION("Sorry, DFT functionals are not suppored for this type of SCF wavefunction.");
+void HF::form_V() {
+    throw PSIEXCEPTION(
+        "Sorry, DFT functionals are not suppored for this type of SCF wavefunction.");
 }
-void HF::form_C()
-{
+void HF::form_C() {
     throw PSIEXCEPTION("Sorry, the base HF wavefunction cannot construct orbitals.");
 }
-void HF::form_D()
-{
+void HF::form_D() {
     throw PSIEXCEPTION("Sorry, the base HF wavefunction cannot construct densities.");
 }
-void HF::rotate_orbitals(SharedMatrix C, const SharedMatrix x)
-{
+std::vector<SharedMatrix> HF::onel_Hx(std::vector<SharedMatrix> x) {
+    throw PSIEXCEPTION("Sorry, the base HF wavefunction cannot construct Hx products.");
+}
+std::vector<SharedMatrix> HF::twoel_Hx(std::vector<SharedMatrix> x, bool combine,
+                                       std::string return_basis) {
+    throw PSIEXCEPTION("Sorry, the base HF wavefunction cannot construct Hx products.");
+}
+std::vector<SharedMatrix> HF::cphf_Hx(std::vector<SharedMatrix> x) {
+    throw PSIEXCEPTION("Sorry, the base HF wavefunction cannot construct cphf_Hx products.");
+}
+std::vector<SharedMatrix> HF::cphf_solve(std::vector<SharedMatrix> x_vec, double conv_tol, int max_iter,
+                                     int print_lvl) {
+    throw PSIEXCEPTION("Sorry, the base HF wavefunction cannot solve CPHF equations.");
+}
+void HF::rotate_orbitals(SharedMatrix C, const SharedMatrix x) {
     // => Rotate orbitals <= //
     SharedMatrix U(new Matrix("Ck", nirrep_, nmopi_, nmopi_));
     std::string reference = options_.get_str("REFERENCE");
@@ -712,25 +732,24 @@ void HF::find_occupation()
             old_docc[h] = doccpi_[h];
         }
 
-        if(!input_docc_ && !input_socc_){
+        if (!input_docc_ && !input_socc_) {
             for (int h = 0; h < nirrep_; ++h) {
                 soccpi_[h] = std::abs(nalphapi_[h] - nbetapi_[h]);
-                doccpi_[h] = std::min(nalphapi_[h] , nbetapi_[h]);
+                doccpi_[h] = std::min(nalphapi_[h], nbetapi_[h]);
             }
         }
 
         bool occ_changed = false;
-        for(int h = 0; h < nirrep_; ++h){
-            if( old_socc[h] != soccpi_[h] || old_docc[h] != doccpi_[h]){
+        for (int h = 0; h < nirrep_; ++h) {
+            if (old_socc[h] != soccpi_[h] || old_docc[h] != doccpi_[h]) {
                 occ_changed = true;
                 break;
             }
         }
 
         // If print > 2 (diagnostics), print always
-        if((print_ > 2 || (print_ && occ_changed)) && iteration_ > 0){
-
-                outfile->Printf( "    Occupation by irrep:\n");
+        if ((print_ > 2 || (print_ && occ_changed)) && iteration_ > 0) {
+            outfile->Printf("    Occupation by irrep:\n");
             print_occupation();
         }
         // Start MOM if needed (called here because we need the nocc
@@ -752,7 +771,8 @@ void HF::print_header()
     outfile->Printf( "\n");
     outfile->Printf( "         ---------------------------------------------------------\n");
     outfile->Printf( "                                   SCF\n");
-    outfile->Printf( "            by Justin Turney, Rob Parrish, and Andy Simmonett\n");
+    outfile->Printf( "            by Justin Turney, Rob Parrish, Andy Simmonett\n");
+    outfile->Printf( "                             and Daniel Smith\n");
     outfile->Printf( "                             %4s Reference\n", options_.get_str("REFERENCE").c_str());
     outfile->Printf( "                      %3d Threads, %6ld MiB Core\n", nthread, memory_ / 1000000L);
     outfile->Printf( "         ---------------------------------------------------------\n");
@@ -1683,34 +1703,38 @@ void HF::iterations()
 
         // We either do SOSCF or DIIS
         bool did_soscf = false;
-        if (soscf_enabled_ && (Drms_ < soscf_r_start_) && (iteration_ > 3)){
+        if (soscf_enabled_ && (Drms_ < soscf_r_start_) && (iteration_ > 3)) {
             compute_orbital_gradient(false);
             diis_performed_ = false;
-
-            if (!test_convergency()){
-                int nmicro = soscf_update();
-                if (nmicro > 0){ // If zero the soscf call bounced for some reason
-                    find_occupation();
-                    status += "SOSCF, nmicro = ";
-                    status += psi::to_string(nmicro);
-                    did_soscf = true; // Stops DIIS
-                }
-                else{
-                    if (print_){
-                        outfile->Printf("Did not take a SOSCF step, using normal convergence methods\n");
-                    }
-                    did_soscf = false; // Back to DIIS
-                }
+            std::string base_name;
+            if (functional_->needs_xc()) {
+                base_name = "SOKS, nmicro = ";
+            } else {
+                base_name = "SOSCF, nmicro = ";
             }
-            else{
+
+            if (!test_convergency()) {
+                int nmicro = soscf_update();
+                if (nmicro > 0) {  // If zero the soscf call bounced for some reason
+                    find_occupation();
+                    status += base_name + psi::to_string(nmicro);
+                    did_soscf = true;  // Stops DIIS
+                } else {
+                    if (print_) {
+                        outfile->Printf(
+                            "Did not take a SOSCF step, using normal convergence methods\n");
+                    }
+                    did_soscf = false;  // Back to DIIS
+                }
+            } else {
                 // We need to ensure orthogonal orbitals and set epsilon
-                status += "SOSCF, conv";
+                status += base_name + "conv";
                 timer_on("HF: Form C");
                 form_C();
                 timer_off("HF: Form C");
-                did_soscf = true; // Stops DIIS
+                did_soscf = true;  // Stops DIIS
             }
-        } // End SOSCF block
+        }  // End SOSCF block
 
         if (!did_soscf){ // Normal convergence procedures if we do not do SOSCF
 
@@ -1811,19 +1835,30 @@ void HF::iterations()
 
 void HF::print_energies()
 {
+    if (!pcm_enabled_){
+        energies_["PCM Polarization"] = 0.0;
+    }
+
+    double hf_energy = energies_["Nuclear"] + energies_["One-Electron"] + energies_["Two-Electron"];
+    double dft_energy = hf_energy + energies_["XC"] + energies_["-D"] + energies_["VV10"];
+    double total_energy = dft_energy  + energies_["EFP"] + energies_["PCM Polarization"];
+
     outfile->Printf("   => Energetics <=\n\n");
     outfile->Printf("    Nuclear Repulsion Energy =        %24.16f\n", energies_["Nuclear"]);
     outfile->Printf("    One-Electron Energy =             %24.16f\n", energies_["One-Electron"]);
     outfile->Printf("    Two-Electron Energy =             %24.16f\n", energies_["Two-Electron"]);
-    outfile->Printf("    DFT Exchange-Correlation Energy = %24.16f\n", energies_["XC"]);
-    outfile->Printf("    Empirical Dispersion Energy =     %24.16f\n", energies_["-D"]);
-    if (!pcm_enabled_)
-        energies_["PCM Polarization"] = 0.0;
-    outfile->Printf("    PCM Polarization Energy =         %24.16f\n", energies_["PCM Polarization"]);
-    outfile->Printf("    EFP Energy =                      %24.16f\n", energies_["EFP"]);
-    outfile->Printf("    Total Energy =                    %24.16f\n", energies_["Nuclear"] +
-        energies_["One-Electron"] + energies_["Two-Electron"] + energies_["XC"] +
-        energies_["-D"] + energies_["EFP"] + energies_["PCM Polarization"]);
+    if(functional_->needs_xc()){
+        outfile->Printf("    DFT Exchange-Correlation Energy = %24.16f\n", energies_["XC"]);
+        outfile->Printf("    Empirical Dispersion Energy =     %24.16f\n", energies_["-D"]);
+        outfile->Printf("    VV10 Nonlocal Energy =            %24.16f\n", energies_["VV10"]);
+    }
+    if (pcm_enabled_){
+        outfile->Printf("    PCM Polarization Energy =         %24.16f\n", energies_["PCM Polarization"]);
+    }
+    if (Process::environment.get_efp()->get_frag_count() > 0){
+        outfile->Printf("    EFP Energy =                      %24.16f\n", energies_["EFP"]);
+    }
+    outfile->Printf("    Total Energy =                    %24.16f\n", total_energy);
     outfile->Printf( "\n");
 
     Process::environment.globals["NUCLEAR REPULSION ENERGY"] = energies_["Nuclear"];
@@ -1831,13 +1866,12 @@ void HF::print_energies()
     Process::environment.globals["TWO-ELECTRON ENERGY"] = energies_["Two-Electron"];
     if (fabs(energies_["XC"]) > 1.0e-14) {
         Process::environment.globals["DFT XC ENERGY"] = energies_["XC"];
-        Process::environment.globals["DFT FUNCTIONAL TOTAL ENERGY"] = energies_["Nuclear"] +
-            energies_["One-Electron"] + energies_["Two-Electron"] + energies_["XC"];
-        Process::environment.globals["DFT TOTAL ENERGY"] = energies_["Nuclear"] +
-            energies_["One-Electron"] + energies_["Two-Electron"] + energies_["XC"] + energies_["-D"];
+        Process::environment.globals["DFT VV10 ENERGY"] = energies_["VV10"];
+        Process::environment.globals["DFT FUNCTIONAL TOTAL ENERGY"] = hf_energy +
+            energies_["XC"] + energies_["VV10"];
+        Process::environment.globals["DFT TOTAL ENERGY"] = dft_energy;
     } else {
-        Process::environment.globals["HF TOTAL ENERGY"] = energies_["Nuclear"] +
-            energies_["One-Electron"] + energies_["Two-Electron"];
+        Process::environment.globals["HF TOTAL ENERGY"] = hf_energy;
     }
     if (fabs(energies_["-D"]) > 1.0e-14) {
         Process::environment.globals["DISPERSION CORRECTION ENERGY"] = energies_["-D"];
@@ -1849,6 +1883,7 @@ void HF::print_energies()
     if(pcm_enabled_ || ( Process::environment.get_efp()->get_frag_count() > 0 ) ) {
         outfile->Printf("    Alert: EFP and PCM quantities not currently incorporated into SCF psivars.");
     }
+    Process::environment.globals["SCF N ITERS"] = iteration_;
 //  Comment so that autodoc utility will find this PSI variable
 //     It doesn't really belong here but needs to be linked somewhere
 //  Process::environment.globals["DOUBLE-HYBRID CORRECTION ENERGY"]

@@ -69,6 +69,8 @@ protected:
     bool meta_;
     // Is LRC?
     bool lrc_;
+    // Unpolarized? (restricted)
+    bool unpolarized_;
 
     // Parameter set
     std::map<std::string, double> parameters_;
@@ -91,9 +93,14 @@ public:
     // Build a base version of a DFA functional (say B97_X)
     static std::shared_ptr<Functional> build_base(const std::string& alias);
 
+    // Clones a *worker* for the functional. This is not a complete functional
+    virtual std::shared_ptr<Functional> build_worker();
+
     // => Computers <= //
 
-    virtual void compute_functional(const std::map<std::string,SharedVector>& in, const std::map<std::string,SharedVector>& out, int npoints, int deriv, double alpha) = 0;
+    virtual void compute_functional(const std::map<std::string, SharedVector>& in,
+                                    const std::map<std::string, SharedVector>& out, int npoints,
+                                    int deriv) = 0;
 
     // => Parameters <= //
 
@@ -105,10 +112,13 @@ public:
     void set_gga(bool gga) { gga_ = gga; }
     void set_meta(bool meta) { meta_ = meta; }
     void set_alpha(double alpha) { alpha_ = alpha; }
-    void set_omega(double omega) { omega_ = omega; lrc_ = (omega_ != 0.0); }
-    void set_name(const std::string & name) { name_ = name; }
-    void set_description(const std::string & description) { description_ = description; }
-    void set_citation(const std::string & citation) { citation_ = citation; }
+    void set_omega(double omega) {
+        omega_ = omega;
+        lrc_ = (omega_ != 0.0);
+    }
+    void set_name(const std::string& name) { name_ = name; }
+    void set_description(const std::string& description) { description_ = description; }
+    void set_citation(const std::string& citation) { citation_ = citation; }
 
     void set_lsda_cutoff(double cut) { lsda_cutoff_ = cut; }
     void set_meta_cutoff(double cut) { meta_cutoff_ = cut; }
@@ -122,6 +132,7 @@ public:
     bool is_meta() const { return meta_; }
     bool is_gga() const { return gga_; }
     bool is_lrc() const { return lrc_; }
+    bool is_unpolarized() const { return unpolarized_; }
 
     double alpha() const { return alpha_; }
     double omega() const { return omega_; }
@@ -133,7 +144,6 @@ public:
     virtual void print(std::string OutFileRMR = "outfile", int print = 1) const;
     void py_print() const { print("outfile", 1); }
     void py_print_detail(int level) const { print("outfile", level); }
-
 };
 
 }
