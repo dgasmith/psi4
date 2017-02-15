@@ -78,6 +78,10 @@ get_property(_loc TARGET libefp::efp PROPERTY LOCATION)
 list(APPEND _addons ${_loc})
 message(STATUS "${Cyan}Using libefp${ColourReset}: ${_loc} (version ${libefp_VERSION})")
 
+find_package(Libxc CONFIG REQUIRED)
+get_property(_loc TARGET Libxc::xc PROPERTY LOCATION)
+message(STATUS "${Cyan}Using Libxc${ColourReset}: ${_loc} (version ${Libxc_VERSION})")
+
 if(${ENABLE_erd})
     find_package(erd 3.0.6 CONFIG REQUIRED)
     get_property(_loc TARGET erd::erd PROPERTY LOCATION)
@@ -215,3 +219,4 @@ write_basic_package_version_file(
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/cmake/psi4/psi4Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/share/cmake/psi4/psi4ConfigVersion.cmake
         DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+

@@ -102,10 +102,7 @@ def oeprop_validator(prop_list):
     Validations a list of OEProp computations. Throws if not found
 
     """
-    oeprop_methods = ['DIPOLE', 'QUADRUPOLE', 'MULLIKEN_CHARGES', 'LOWDIN_CHARGES',
-                      'WIBERG_LOWDIN_INDICES', 'MAYER_INDICES', 'MAYER_INDICES',
-                      'MO_EXTENTS', 'GRID_FIELD', 'GRID_ESP', 'ESP_AT_NUCLEI',
-                      'NO_OCCUPATIONS']
+    oeprop_methods = core.OEProp.valid_methods
 
     if not len(prop_list):
         raise ValidationnError("OEProp: No properties specified!")
