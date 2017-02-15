@@ -7,6 +7,7 @@ set(sources_list #dealias.cc
                  #schwarz.cc
                  fittingmetric.cc
                  #qr.cc
+                 df_helper.cc
                  cholesky.cc
 )
 psi4_add_module(lib 3index sources_list mints fock)
