@@ -88,6 +88,9 @@ protected:
     // GRAC data
     bool grac_initialized_;
 
+    // VV10 dispersion, return vv10_nlc energy
+    double vv10_nlc(SharedMatrix ret);
+
     /// Set things up
     void common_init();
 public:
