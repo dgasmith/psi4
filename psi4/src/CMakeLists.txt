@@ -32,7 +32,7 @@ if(TARGET dkh::dkh)
 endif()
 target_link_libraries(core PRIVATE ${psi4_binmodules})
 target_link_libraries(core PRIVATE ${LIBC_INTERJECT})
-target_link_libraries(core PUBLIC Libxc::xc)
+target_link_libraries(core PRIVATE Libxc::xc)
 target_link_libraries(core PUBLIC pybind11::module)
 target_link_libraries(core PRIVATE Threads::Threads)
 
@@ -62,7 +62,11 @@ install(EXPORT "psi4Targets"
 set(_full_path_staged_libdir "${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 file(RELATIVE_PATH _rel ${_full_path_staged_libdir}${PYMOD_INSTALL_LIBDIR}/psi4
                         ${_full_path_staged_libdir})
-set(psi4_RPATH "$ORIGIN/${_rel}")
+if(APPLE)
+    set(psi4_RPATH "@loader_path/${_rel}")
+else()
+    set(psi4_RPATH "$ORIGIN/${_rel}")
+endif()
 
 foreach(_al ${_addons})
     get_filename_component(_ald ${_al} DIRECTORY)
