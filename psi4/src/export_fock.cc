@@ -61,6 +61,7 @@ void export_fock(py::module &m) {
                  jk.C_left().clear();
                  jk.C_right().clear();
              })
+        .def("C_add", [](JK &jk, SharedMatrix Cl) { jk.C_left().push_back(Cl); jk.C_right().push_back(Cl); })
         .def("C_left_add", [](JK &jk, SharedMatrix Cl) { jk.C_left().push_back(Cl); })
         .def("C_right_add", [](JK &jk, SharedMatrix Cr) { jk.C_right().push_back(Cr); })
         .def("J", &JK::J, py::return_value_policy::reference_internal)
