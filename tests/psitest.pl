@@ -138,7 +138,7 @@ sub do_tests
     if ($jobtype eq "energy" || 
         $jobtype eq "gradient" || 
         $jobtype eq "hessian" || 
-        $jobtype eq "property") {
+        $jobtype eq "properties") {
       
       $fail |= compare_nuc();
       $fail |= compare_scf_energy();  # We always have SCF energies?
@@ -176,7 +176,7 @@ sub do_tests
           if ($wfn eq "SCF+D")  { $fail |= compare_scf_d_energy(); last SWITCH2; }
       }
 
-     if ($jobtype eq "property") {
+     if ($jobtype eq "properties") {
        if ($wfn eq "CCSD" || $wfn eq "ccsd" || 
            $wfn eq "CC2" || $wfn eq "cc2") {
           $fail |= compare_cclambda_overlap($wfn);
@@ -3198,8 +3198,8 @@ sub get_calctype_string
       @data = split(/\'/, $line);
       $wfn = $data[1];
     }
-    elsif ($line =~ m/property\s*\(/) {
-      $jobtype = "property";
+    elsif ($line =~ m/properties\s*\(/) {
+      $jobtype = "properties";
       @data = split(/\'/, $line);
       $wfn = $data[1];
     }

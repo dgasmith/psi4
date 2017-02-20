@@ -40,7 +40,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 #    - PYTHON_INCLUDE_DIR "Path to the python include files (e.g., /path/to/include/python2.7)"
 #    - SPHINX_ROOT "Root directory for Sphinx: 'bin/sphinx-build' (or similar) should be in this dir."
 #
-#    For any ${AddOn} of: CheMPS2, dkh, libefp, erd, gdma, libint, pybind11
+#    For any ${AddOn} of: CheMPS2, dkh, libefp, erd, gdma, libint, pybind11, Libxc
 #    - CMAKE_PREFIX_PATH "Set to list of root directories to look for externally built add-ons and dependencies
 #      (e.g., /path/to/install-libint;/path/to/install-gdma where exists /path/to/install-libint/lib/libderiv.a)"
 #    - ${AddOn}_DIR "Set to directory containing ${AddOn}Config.cmake file to facilitate detection of external build"
@@ -201,6 +201,7 @@ ExternalProject_Add(psi4-core
               -DTargetLAPACK_DIR=${TargetLAPACK_DIR}
               -DTargetHDF5_DIR=${TargetHDF5_DIR}
               -Dpybind11_DIR=${pybind11_DIR}
+              -DLibxc_DIR=${Libxc_DIR}
               -DFortran_ENABLED=${Fortran_ENABLED}
               -DLIBC_INTERJECT=${LIBC_INTERJECT}
               -DRESTRICT_KEYWORD=${RESTRICT_KEYWORD}
@@ -221,7 +222,8 @@ add_dependencies(psi4-core lapack_external
                            #gtfock_external
                            libint_external
                            pcmsolver_external
-                           pybind11_external)
+                           pybind11_external
+                           libxc_external)
 add_subdirectory(external/downstream)
 add_subdirectory(doc)
 include(ConfigTesting)
