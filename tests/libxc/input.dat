@@ -136,8 +136,6 @@ psi4.core.set_output_file("output.dat", False)
 #                  "dft_nuclear_scheme": "treutler"})  # Rarely needed
 
 keys = list(set(list(psi_data)) | set(list(qchem_data))) 
-#keys = [x for x in keys if "VV10" in x]
-keys = ["B3LYP", "CAM-B3LYP"]
 keys.sort()
 
 print("           Functional:            libxc :      rob    qchem")
