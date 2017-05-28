@@ -79,10 +79,11 @@ Wavefunction::Wavefunction(std::shared_ptr<Molecule> molecule,
     common_init();
 }
 
-Wavefunction::Wavefunction(std::shared_ptr<Molecule> molecule, std::shared_ptr<BasisSet> basis) :
-        options_(Process::environment.options), basisset_(basis), molecule_(molecule), ecpbasisset_(nullptr)
-{
-
+Wavefunction::Wavefunction(std::shared_ptr<Molecule> molecule, std::shared_ptr<BasisSet> basis)
+    : options_(Process::environment.options),
+      basisset_(basis),
+      molecule_(molecule),
+      ecpbasisset_(nullptr) {
     common_init();
 }
 
@@ -1070,7 +1071,6 @@ SharedVector Wavefunction::get_atomic_point_charges() const
 }
 double Wavefunction::get_variable(std::string label) {
     std::string uc_label = label;
-    std::transform(uc_label.begin(), uc_label.end(), uc_label.begin(), ::toupper);
 
     if (variables_.count(uc_label) == 0) {
         throw PSIEXCEPTION("Wavefunction::get_variable: Requested variable " + label +
@@ -1080,18 +1080,6 @@ double Wavefunction::get_variable(std::string label) {
     }
 }
 SharedMatrix Wavefunction::get_array(std::string label) {
-    // if (label == "Fa") {
-    //     return Fa_;
-    // } else if (label == "Fb") {
-    //     return Fb_;
-    // } else if (label == "Ca") {
-    //     return Ca_;
-    // } else if (label == "Cb") {
-    //     return Cb_;
-    // } else if (label == "Da") {
-    //     return Da_;
-    // } else if (label == "Db") {
-    //     return Db_;
     if (arrays_.count(label) == 0) {
         throw PSIEXCEPTION("Wavefunction::get_array: Requested array " + label + " was not set!\n");
     } else {
