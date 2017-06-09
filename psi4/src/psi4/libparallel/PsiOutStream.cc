@@ -33,6 +33,7 @@
 
 #include <cstdio>
 #include <fstream>
+#include <cstdarg>
 
 namespace psi {
 
