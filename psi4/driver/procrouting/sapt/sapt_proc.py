@@ -44,13 +44,13 @@ __all__ = ['run_sapt_dft', 'sapt_dft']
 
 
 def run_sapt_dft(name, **kwargs):
-    optstash = p4util.OptionsState(['SCF', 'SCF_TYPE'], ['SCF', 'REFERENCE'], ['SCF', 'DFT_GRAC_SHIFT'],
+    optstash = p4util.OptionsState(['SCF_TYPE'], ['SCF', 'REFERENCE'], ['SCF', 'DFT_GRAC_SHIFT'],
                                    ['SCF', 'SAVE_JK'])
 
     core.tstart()
     # Alter default algorithm
     if not core.has_option_changed('SCF', 'SCF_TYPE'):
-        core.set_local_option('SCF', 'SCF_TYPE', 'DF')
+        core.set_global_option('SCF_TYPE', 'DF')
 
     core.prepare_options_for_module("SAPT")
 
@@ -86,7 +86,7 @@ def run_sapt_dft(name, **kwargs):
     core.print_out("   Monomer A GRAC Shift    %12.6f\n" % mon_a_shift)
     core.print_out("   Monomer B GRAC Shift    %12.6f\n" % mon_b_shift)
     core.print_out("   Delta HF                %12s\n" % ("True" if do_delta_hf else "False"))
-    core.print_out("   JK Algorithm            %12s\n" % core.get_option("SCF", "SCF_TYPE"))
+    core.print_out("   JK Algorithm            %12s\n" % core.get_option('SCF', "SCF_TYPE"))
     core.print_out("\n")
     core.print_out("   Required computations:\n")
     if (do_delta_hf):
@@ -216,7 +216,7 @@ def run_sapt_dft(name, **kwargs):
     core.set_global_option("DFT_GRAC_SHIFT", 0.0)
 
     # Write out header
-    scf_alg = core.get_option("SCF", "SCF_TYPE")
+    scf_alg = core.get_option('SCF', "SCF_TYPE")
     sapt_dft_header(sapt_dft_functional, mon_a_shift, mon_b_shift, bool(do_delta_hf), scf_alg)
 
     # Call SAPT(DFT)

@@ -26,6 +26,7 @@ set {
   pcm true
   pcm_scf_type total
 }
+print('!!!! PK', get_global_option('SCF_TYPE'), get_option('SCF', 'SCF_TYPE'))
 
 pcm = {
    Units = Angstrom
@@ -66,6 +67,7 @@ compare_values(polenergy, wfn.get_variable("PCM POLARIZATION ENERGY"), 6, "Polar
 # Check SCF_TYPE OUT_OF_CORE
 set reference rhf
 set scf_type out_of_core
+print('!!!! OOC', get_global_option('SCF_TYPE'), get_option('SCF', 'SCF_TYPE'))
 print('OUT_OF_CORE-RHF-PCM, total algorithm')
 energy_scf, wfn = energy('scf', return_wfn=True)
 compare_values(nucenergy, NH3.nuclear_repulsion_energy(), 10, "Nuclear repulsion energy (PCM, total algorithm)") #TEST
@@ -89,6 +91,7 @@ compare_values(polenergy, wfn.get_variable("PCM POLARIZATION ENERGY"), 6, "Polar
 # Check SCF_TYPE DIRECT
 set reference rhf
 set scf_type direct
+print('!!!! DIRECT', get_global_option('SCF_TYPE'), get_option('SCF', 'SCF_TYPE'))
 print('DIRECT-RHF-PCM, total algorithm')
 energy_scf, wfn = energy('scf', return_wfn=True)
 compare_values(nucenergy, NH3.nuclear_repulsion_energy(), 10, "Nuclear repulsion energy (PCM, total algorithm)") #TEST
@@ -112,6 +115,7 @@ compare_values(polenergy, wfn.get_variable("PCM POLARIZATION ENERGY"), 6, "Polar
 # Check SCF_TYPE DF
 set reference rhf
 set scf_type df
+print('!!!! DF', get_global_option('SCF_TYPE'), get_option('SCF', 'SCF_TYPE'))
 print('DF-RHF-PCM, total algorithm')
 energy_scf, wfn = energy('scf', return_wfn=True)
 compare_values(nucenergy, NH3.nuclear_repulsion_energy(), 10, "Nuclear repulsion energy (PCM, total algorithm)") #TEST
@@ -135,6 +139,7 @@ compare_values(df_polenergy, wfn.get_variable("PCM POLARIZATION ENERGY"), 6, "Po
 # Check SCF_TYPE CD
 set reference rhf
 set scf_type cd
+print('!!!! CD', get_global_option('SCF_TYPE'), get_option('SCF', 'SCF_TYPE'))
 print('CD-RHF-PCM, total algorithm')
 energy_scf, wfn = energy('scf', return_wfn=True)
 compare_values(nucenergy, NH3.nuclear_repulsion_energy(), 10, "Nuclear repulsion energy (PCM, total algorithm)") #TEST
