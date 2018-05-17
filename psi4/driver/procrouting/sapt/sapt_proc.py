@@ -44,13 +44,13 @@ __all__ = ['run_sapt_dft', 'sapt_dft']
 
 
 def run_sapt_dft(name, **kwargs):
-    optstash = p4util.OptionsState(['SCF', 'SCF_TYPE'], ['SCF', 'REFERENCE'], ['SCF', 'DFT_GRAC_SHIFT'],
+    optstash = p4util.OptionsState(['SCF_TYPE'], ['SCF', 'REFERENCE'], ['SCF', 'DFT_GRAC_SHIFT'],
                                    ['SCF', 'SAVE_JK'])
 
     core.tstart()
     # Alter default algorithm
     if not core.has_option_changed('SCF', 'SCF_TYPE'):
-        core.set_local_option('SCF', 'SCF_TYPE', 'DF')
+        core.set_global_option('SCF_TYPE', 'DF')
 
     core.prepare_options_for_module("SAPT")
 
