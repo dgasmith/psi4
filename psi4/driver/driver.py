@@ -489,9 +489,9 @@ def energy(name, **kwargs):
     if kwargs.get('bsse_type', None) is not None:
         nbody = driver_nbody.NBodyComputer(molecule=molecule, driver="energy", **kwargs)
 
-    # Bounce if name is function
-    if hasattr(name, '__call__'):
-        return name(energy, kwargs.pop('label', 'custom function'), ptype='energy', **kwargs)
+    ## Bounce if name is function
+    #if hasattr(name, '__call__'):
+    #    return name(energy, kwargs.pop('label', 'custom function'), ptype='energy', **kwargs)
 
     # Allow specification of methods to arbitrary order
     lowername = name.lower()
@@ -500,9 +500,11 @@ def energy(name, **kwargs):
         kwargs['level'] = level
 
     # Bounce to CBS if "method/basis" name
-    if "/" in lowername:
+    #if "/" in lowername:
+    if kwargs.get('cbs_metadata', None) is not None:
         # Change that later when cbs class ic completed
-        cbs = driver_cbs.CBSComputer(molecule=molecule, driver="energy", **kwargs)
+        keywords = {i: j['value'] for i, j in p4util.prepare_options_for_modules(changedOnly=True)['GLOBALS'].items()}
+        cbs = driver_cbs.CBSComputer(molecule=molecule, driver="energy", keywords=keywords, **kwargs)
 
     if nbody is not None or cbs is not None:
         # Now works for either nbody or cbs
